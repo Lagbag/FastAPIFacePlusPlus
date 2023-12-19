@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db_aidiagnostic:
+    image: postgres:latest
+    volumes:
+      - db_aidiagnostic:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - "5435:5432"
+
+  web:
+    build: .
+    env_file:
+      - .env
+    command: uvicorn app.main:app --reload --port 8000 --host 0.0.0.0
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db_aidiagnostic
+
+
+volumes:
+  db_aidiagnostic:
