@@ -6,15 +6,14 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from main import pwd_context
-from config import SECRET_KEY, ALGORITHM
-from schema.UserSchema import TokenData
-from models.UserModel import User
+from app.services.utils import pwd_context, oauth2_scheme
+from app.services.config import SECRET_KEY, ALGORITHM
+from app.schema.UserSchema import TokenData
+from app.models.UserModel import User
 
 from .async_database import get_async_session
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from main import oauth2_scheme
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -24,8 +23,8 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def authenticate_user(username: str, password: str, session: AsyncSession = Depends(get_async_session)):
-    user = User.get_user_by_username(username, session)
+async def authenticate_user(username: str, password: str, session: AsyncSession = Depends(get_async_session)):
+    user = await User.get_user_by_username(username, session)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):

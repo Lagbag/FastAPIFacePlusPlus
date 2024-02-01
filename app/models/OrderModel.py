@@ -7,6 +7,7 @@ from fastapi import Depends
 from ..services.async_database import get_async_session
 from app.services.async_database import Base
 import datetime
+from app.models.InstrumetsModel import Instrument
 
 class Order(Base):
     __tablename__ = "orders"
@@ -16,4 +17,6 @@ class Order(Base):
     user = Column(Integer, ForeignKey("users.id"), nullable=False)
     count = Column(Integer, nullable=False)
     time = Column(TIMESTAMP, default=datetime.datetime.now())
-    instruments = relationship("Instrument", back_populates="orders")
+    # instruments = relationship("Instrument", back_populates="orders")
+    instrument_id = Column(Integer, ForeignKey('instruments.id'))
+    instruments = relationship('Instrument', back_populates='orders')
