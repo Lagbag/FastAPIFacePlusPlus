@@ -11,7 +11,7 @@ from alembic import context
 
 from app.services.config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
 from app.services.async_database import Base
-from app.models import Face, Image
+from app.models import User, Order, Instrument
 
 
 # this is the Alembic Config object, which provides

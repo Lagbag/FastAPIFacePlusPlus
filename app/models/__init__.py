@@ -1,4 +1,5 @@
 from app.services.async_database import Base
-from .ImageModel import Image
-from .FaceModel import Face
+from .InstrumetsModel import Instrument
+from .OrderModel import Order
+from .UserModel import User
 
