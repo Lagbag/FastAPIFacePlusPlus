@@ -13,7 +13,7 @@
 
 # from app.models.FaceModel import Face
 # from app.models.ImageModel import Image
-# from app.schema.ImageSchema import GetImageParams, CompareFacesResponse, CompareFacesRequest, ImageDeletionResponse
+# from app.schema.UserSchema import GetImageParams, CompareFacesResponse, CompareFacesRequest, ImageDeletionResponse
 # from app.services.config import FACE_API_TOKEN, FACE_API_SECRET
 # from app.services.async_database import get_async_session
 

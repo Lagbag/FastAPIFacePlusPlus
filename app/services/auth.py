@@ -8,6 +8,13 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 from main import pwd_context
 from config import SECRET_KEY, ALGORITHM
+from schema.UserSchema import TokenData
+from models.UserModel import User
+
+from .async_database import get_async_session
+
+from sqlalchemy.ext.asyncio import AsyncSession
+from main import oauth2_scheme
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -17,14 +24,8 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDB(**user_dict)
-
-
-def authenticate_user(username: str, password: str):
-    user = get_user(username)
+def authenticate_user(username: str, password: str, session: AsyncSession = Depends(get_async_session)):
+    user = User.get_user_by_username(username, session)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -43,7 +44,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: AsyncSession = Depends(get_async_session)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -57,15 +58,16 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = get_user(username=token_data.username)
+    user = User.get_user_by_username(username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
 
 
 async def get_current_active_user(
-    current_user: Annotated[User, Depends(get_current_user)]
+    current_user: Annotated[User, Depends(get_current_user)],
+    session: AsyncSession = Depends(get_async_session)
 ):
-    if current_user.disabled:
+    if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user

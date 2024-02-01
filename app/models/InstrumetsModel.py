@@ -1,12 +1,10 @@
-from sqlalchemy import (JSON, TIMESTAMP, Boolean, Column, ForeignKey, Integer,
-                        String, Table, DateTime, func, DECIMAL)
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, insert
 from fastapi import Depends
 from ..services.async_database import get_async_session
 from app.services.async_database import Base
-import datetime
 
 
 class Instrument(Base):
